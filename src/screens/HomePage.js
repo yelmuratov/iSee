@@ -1,5 +1,4 @@
-import {Text, View } from 'react-native'
-import { StatusBar } from 'expo-status-bar'
+import {View } from 'react-native'
 import React from 'react'
 import OpenCamera from '../components/OpenCamera'
 
