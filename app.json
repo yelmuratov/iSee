@@ -1,0 +1,38 @@
+{
+  "expo": {
+    "name": "iSee",
+    "slug": "iSee",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/1.svg",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow iSee to access your camera."
+        }
+      ]
+    ]
+  }
+}
