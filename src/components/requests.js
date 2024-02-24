@@ -70,38 +70,27 @@ export const deleteImage = async (imageUri) => {
     }
 };
 
-const convertTextToAudio = async (text) => {
-    const url = "https://mohir.ai/api/v1/tts";
-    const apiKey = "d6551223-d914-4488-ad8c-050268b8d535:1fc2f5fb-5635-45ed-a43f-dfe1091bd43a";
-
-    const data = JSON.stringify({
-      "text": `${text}`,
-      "model": "davron",
-      "mood": "neutral",
-      "blocking": true,
-      "webhook_notification_url": ""
-    });
-
-    const headers = {
-      "Authorization": apiKey,
-      "Content-Type": "application/json"
+export async function sendTextToSpeechRequest(text) {
+    const url = 'http://44.204.66.45/text_to_speech/?text=' + encodeURIComponent(text);
+    const options = {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json'
+      },
     };
-
+  
     try {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: headers,
-        body: data
-      });
-
-      if (response.ok) {
-        const jsonResponse = await response.json();
-        const audioUrl = jsonResponse.result.url;
-        return audioUrl;
-      } else {
-        console.error('Failed to convert text to audio. Status code:', response.status);
+      const response = await fetch(url, options);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
       }
+      const data = await response.json();
+      return data?.result?.url;
     } catch (error) {
-      console.error('Error converting text to audio:', error);
+      console.error('Error:', error);
     }
-  };
+  }
+  
+  
+  
+  

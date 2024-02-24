@@ -4,15 +4,15 @@ import { FontAwesome } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
 import * as Speech from 'expo-speech';
 import Button from '../components/Button';
-import { sendMessageToApi } from '../components/requests';
+import { sendTextToSpeechRequest, sendMessageToApi } from '../components/requests';
 import LottieView from 'lottie-react-native';
-
+import { Audio } from 'expo-av';
 
 export default function DescriptionPage({image,reTake,description,lang}) {
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState('')
   const scrollViewRef = useRef(null);
-
+  const sound = useRef(new Audio.Sound());
 
   useEffect(()=>{
     speak(description?.iSee);
@@ -24,8 +24,8 @@ export default function DescriptionPage({image,reTake,description,lang}) {
     setMessages(prev => [...prev, { role: 'user', content: message }]);
     try{
       const responseMessage = await sendMessageToApi(lang, description?.photo, message);
-      speak(responseMessage.iSee);
-      setMessages(prev => [...prev, { role: 'assistant', content: responseMessage.iSee }]);
+      speak(responseMessage?.iSee);
+      setMessages(prev => [...prev, { role: 'assistant', content: responseMessage?.iSee }]);
     }catch(e){
       console.log("Error in send message");
     }
@@ -35,15 +35,47 @@ export default function DescriptionPage({image,reTake,description,lang}) {
     scrollViewRef?.current?.scrollToEnd({ animated: true });
   }
 
-  const speak =(speechText) => {
-    // Speak the text with specified language
-    if(speechText){
+  const loadAudio = async (musicPath) => {
+    try {
+      const soundObject = new Audio.Sound();
+      await soundObject.loadAsync({ uri: musicPath });
+      sound.current = soundObject;
+      console.log('Audio loaded successfully');
+      
+      const status = await sound.current.getStatusAsync();
+      if (status.isLoaded && !status.isPlaying) {
+        await sound.current.playAsync();
+        console.log('Audio playback started');
+      }
+    } catch (error) {
+      console.error('Error loading or playing audio:', error);
+    }
+  };
+
+  const stopMusic = async () => {
+    try {
+      await sound.current.stopAsync();
+    } catch (error) {
+      console.error('Error stopping audio:', error);
+    }
+  };
+
+  const speak = async(speechText) => {
+  // Speak the text with specified language
+  if(speechText){
       if(lang!='uz'){
         const begginningText = lang=='en'?"I see": "аи cии"
         try {
           Speech.speak(begginningText+ " " + speechText);
         } catch (error) {
           console.log("Error in text to speech");
+        }
+      }else{
+        try{
+          const res = await sendTextToSpeechRequest(await speechText);
+          await loadAudio(res);
+        }catch(e){
+          console.log(e);
         }
       }
     }
@@ -97,7 +129,7 @@ export default function DescriptionPage({image,reTake,description,lang}) {
         })}
         </ScrollView>
             <View className="flex flex-row w-[90%] items-center items-center bg-[#3C3E74] px-4 py-2 rounded-xl ml-5 my-5">
-                <Button iconName={'camera'} size={40} onPress={reTake}/>
+                <Button iconName={'camera'} size={40} onPress={()=>{reTake();stopMusic()}}/>
                 <TextInput 
                   placeholder='Message...' 
                   placeholderTextColor={"white"} 

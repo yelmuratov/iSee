@@ -14,9 +14,6 @@ export default function OpenCamera() {
   const [lang,setLang] = useState("en");
   const[response,setResponse] = useState();
   const sound = useRef(new Audio.Sound());
-  const [isMusicPlaying, setIsMusicPlaying] = useState(false);
-  const [isMusicLoaded, setIsMusicLoaded] = useState(false);
-
 
   useEffect(() => {
     (async () => {
@@ -34,7 +31,6 @@ export default function OpenCamera() {
       try {
         await loadAudio();
         await playAudio(); 
-        setIsMusicLoaded(true);
         const { uri } = await cameraRef.current.takePictureAsync();
         setImage(uri);
         const res = await sendImageToApi(uri,lang);
@@ -83,7 +79,6 @@ export default function OpenCamera() {
   const playAudio = async () => {
     try {
       await sound.current.replayAsync();
-      setIsMusicPlaying(true);
     } catch (error) {
       console.error('Error playing audio:', error);
     }
