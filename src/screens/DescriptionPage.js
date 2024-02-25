@@ -12,6 +12,7 @@ export default function DescriptionPage({image,reTake,description,lang}) {
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState('')
   const scrollViewRef = useRef(null);
+  const [loaded,setLoaded] = useState(false);
   const sound = useRef(new Audio.Sound());
 
   useEffect(()=>{
@@ -56,7 +57,7 @@ export default function DescriptionPage({image,reTake,description,lang}) {
     try {
       await sound.current.stopAsync();
     } catch (error) {
-      console.error('Error stopping audio:', error);
+      console.error('Error stopping audio in descr:', error);
     }
   };
 
@@ -129,7 +130,7 @@ export default function DescriptionPage({image,reTake,description,lang}) {
         })}
         </ScrollView>
             <View className="flex flex-row w-[90%] items-center items-center bg-[#3C3E74] px-4 py-2 rounded-xl ml-5 my-5">
-                <Button iconName={'camera'} size={40} onPress={()=>{reTake();stopMusic()}}/>
+                <Button iconName={'camera'} size={40} onPress={()=>{reTake(); lang=='uz'?stopMusic():""}}/>
                 <TextInput 
                   placeholder='Message...' 
                   placeholderTextColor={"white"} 

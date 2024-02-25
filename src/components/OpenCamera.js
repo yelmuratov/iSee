@@ -1,42 +1,85 @@
-import { View, Text,TouchableOpacity } from 'react-native'
-import React, {useState,useEffect,useRef} from 'react'
-import {Camera,CameraType} from 'expo-camera'
+import { View, Text, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { Camera, CameraType } from 'expo-camera';
 import * as Speech from 'expo-speech';
 import { Audio } from 'expo-av';
 import DescriptionPage from '../screens/DescriptionPage';
 import { deleteImage, sendImageToApi } from './requests';
+import { FontAwesome5 } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
+import { LogBox } from 'react-native';
+
+LogBox.ignoreLogs([
+  'new NativeEventEmitter()',
+  // Any other warnings you want to ignore
+]);
 
 export default function OpenCamera() {
   const [type, setType] = useState(CameraType.back);
-  const [permission, setPermission] = useState();
+  const [permission, setPermission] = useState(null);
   const cameraRef = useRef(null);
-  const [image,setImage] = useState();
-  const [lang,setLang] = useState("en");
-  const[response,setResponse] = useState();
-  const sound = useRef(new Audio.Sound());
+  const [image, setImage] = useState(null);
+  const [lang, setLang] = useState("en");
+  const [response, setResponse] = useState(null);
+  const sound = useRef(null);
+
+  async function requestPermission() {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      alert('Sorry, we need camera roll permissions to make this work!');
+    }
+  }
+  
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+    setImage(result.assets[0].uri,lang);
+    if (!result.canceled) {
+      await loadAudio();
+      await playAudio();
+      // Use the URI of the selected image
+      console.log("Image taken succesfully");
+    }
+    const response = await sendImageToApi(result.assets[0].uri,lang);
+    setResponse(response);
+    await stopMusic()
+  };
+  
+  
 
   useEffect(() => {
+    requestPermission();
     (async () => {
-      const cameraStatus = await Camera.requestCameraPermissionsAsync();
-      setPermission(cameraStatus.status === 'granted');
+      const {granted} = await Camera.requestCameraPermissionsAsync();
+      setPermission(granted);
+      // Initialize Audio
+      await Audio.setAudioModeAsync({
+        playsInSilentModeIOS: true,
+      });
+      sound.current = new Audio.Sound();
     })();
   }, []);
 
-  if(!permission){
-    return <Text>No acces to Camera</Text>
+  if (permission === null) {
+    return <View><Text>Requesting permissions...</Text></View>;
+  } else if (!permission) {
+    return <View><Text>No access to Camera</Text></View>;
   }
 
   const handleTakePicture = async () => {
     if (cameraRef.current) {
       try {
         await loadAudio();
-        await playAudio(); 
+        await playAudio();
         const { uri } = await cameraRef.current.takePictureAsync();
         setImage(uri);
-        const res = await sendImageToApi(uri,lang);
+        const res = await sendImageToApi(uri, lang);
         setResponse(res);
-        stopMusic();
-        // Handle the taken picture URI as needed (e.g., save to device, upload, display, etc.)
+        await stopMusic();
       } catch (error) {
         console.error('Error taking picture:', error);
       }
@@ -51,26 +94,21 @@ export default function OpenCamera() {
     }
   };
 
-  const reTakePhoto = ()=>{
+  const reTakePhoto = () => {
     deleteImage(response?.photo);
     setImage(null);
     setResponse(null);
     Speech.stop();
     stopMusic();
-  }
-  const loadAudio = async () => {
-    if (sound.current != null) {
-      // Check if the sound is already loaded
-      if (sound.current.getStatusAsync().isLoaded) {
-        console.log('Audio is already loaded');
-        return;
-      }
-    }
+  };
 
+  const loadAudio = async () => {
     try {
-      sound.current = new Audio.Sound();
-      await sound.current.loadAsync(require('../../assets/waiting.mp3'));
-      console.log('Audio loaded successfully');
+      const status = await sound.current.getStatusAsync();
+      if (!status.isLoaded) {
+        await sound.current.loadAsync(require('../../assets/waiting.mp3'));
+        console.log('Audio loaded successfully');
+      }
     } catch (error) {
       console.error('Error loading audio:', error);
     }
@@ -78,7 +116,7 @@ export default function OpenCamera() {
 
   const playAudio = async () => {
     try {
-      await sound.current.replayAsync();
+      await sound.current.playAsync();
     } catch (error) {
       console.error('Error playing audio:', error);
     }
@@ -93,6 +131,9 @@ export default function OpenCamera() {
             <TouchableOpacity><Text className={`${lang=='ru'?"text-gray-700":"text-white"} px-3 bold text-2xl font-bold`} onPress={()=>setLang('ru')}>RU</Text></TouchableOpacity>
             <TouchableOpacity><Text className={`${lang=='uz'?"text-gray-700":"text-white"} px-3 bold text-2xl font-bold`} onPress={()=>setLang('uz')}>UZ</Text></TouchableOpacity>
         </View>
+        <TouchableOpacity className="absolute bottom-[100px] left-12" onPress={pickImage}>
+          <FontAwesome5 name="images" size={50} color="white"/>
+        </TouchableOpacity>
         <View className="absolute bottom-20 flex flex-row items-center justify-between border-4 border-white p-1 rounded-full">
             <TouchableOpacity 
                 className="bg-white w-[80px] h-[80px] rounded-full"
