@@ -1,4 +1,4 @@
-const baseUrl = "http://44.204.66.45";
+const baseUrl = "https://isee.diyarbek.ru";
 
 export const sendImageToApi = async (imageUri, lang) => {
     try {
@@ -16,7 +16,7 @@ export const sendImageToApi = async (imageUri, lang) => {
         const response = await fetch(`${baseUrl}/generate_image_description/?lang=${lang}`, {
             method: 'POST',
             body: formData,
-            headers: {
+            headers: { 
                 'Content-Type': 'multipart/form-data',
             },
         });
@@ -61,8 +61,6 @@ export const deleteImage = async (imageUri) => {
         });
         if (response.ok) {
             return await response.json();
-        } else {
-            throw new Error("An error has occurred");
         }
     } catch (error) {
         console.error("Error while deleting image:", error);
@@ -71,7 +69,7 @@ export const deleteImage = async (imageUri) => {
 };
 
 export async function sendTextToSpeechRequest(text) {
-    const url = 'http://44.204.66.45/text_to_speech/?text=' + encodeURIComponent(text);
+    const url = 'https://isee.diyarbek.ru/text_to_speech/?text=' + encodeURIComponent(text);
     const options = {
       method: 'POST',
       headers: {

@@ -37,6 +37,13 @@
         {
           "cameraPermission": "Allow iSee to access your camera."
         }
+      ],
+      [
+        "@react-native-voice/voice",
+        {
+          "microphonePermission": "CUSTOM: Allow iSee to access the microphone",
+          "speechRecognitionPermission": "CUSTOM: Allow iSee to securely recognize user speech"
+        }
       ]
     ],
     "extra": {

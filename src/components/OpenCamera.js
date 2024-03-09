@@ -7,6 +7,7 @@ import DescriptionPage from '../screens/DescriptionPage';
 import { deleteImage, sendImageToApi } from './requests';
 import { FontAwesome5 } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
+import * as ImageManipulator from 'expo-image-manipulator';
 import { LogBox } from 'react-native';
 
 LogBox.ignoreLogs([
@@ -76,15 +77,23 @@ export default function OpenCamera() {
         await loadAudio();
         await playAudio();
         const { uri } = await cameraRef.current.takePictureAsync();
-        setImage(uri);
-        const res = await sendImageToApi(uri, lang);
+  
+        // Resize the image to 512x512
+        const resizedImage = await ImageManipulator.manipulateAsync(
+          uri,
+          [{ resize: { width: 512, height: 512 } }],
+          { compress: 1, format: ImageManipulator.SaveFormat.PNG }
+        );
+  
+        setImage(resizedImage.uri); // Update your state with the resized image URI
+        const res = await sendImageToApi(resizedImage.uri, lang); // Send the resized image to your API
         setResponse(res);
         await stopMusic();
       } catch (error) {
         console.error('Error taking picture:', error);
       }
     }
-  };
+  }
 
   const stopMusic = async () => {
     try {

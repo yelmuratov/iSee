@@ -1,4 +1,4 @@
-import { View,Image,Text, TextInput, ScrollView } from 'react-native'
+import { View,Image,Text, TextInput, ScrollView, TouchableOpacity } from 'react-native'
 import React, {useEffect, useRef, useState} from 'react'
 import { FontAwesome } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -7,20 +7,47 @@ import Button from '../components/Button';
 import { sendTextToSpeechRequest, sendMessageToApi } from '../components/requests';
 import LottieView from 'lottie-react-native';
 import { Audio } from 'expo-av';
+import * as Sharing from 'expo-sharing';
+import { LogBox } from 'react-native';
+
+LogBox.ignoreLogs([
+  'new NativeEventEmitter()',
+  // Any other warnings you want to ignore
+]);
 
 export default function DescriptionPage({image,reTake,description,lang}) {
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState('')
   const scrollViewRef = useRef(null);
-  const [loaded,setLoaded] = useState(false);
   const sound = useRef(new Audio.Sound());
 
   useEffect(()=>{
-    speak(description?.iSee);
+    const options = {
+      language:lang, // Set the language here
+      pitch: 1.0,
+      rate: 1.0,
+    };
+    speak(description?.iSee,options);
   },[description?.iSee])
 
+  const shareImageWithTitle = async (imageUri) => {
+    try {
+      const isAvailable = await Sharing.isAvailableAsync();
+      if (!isAvailable) {
+        alert('Sharing is not available on your device.');
+        return;
+      }
+  
+      await Sharing.shareAsync(imageUri);
+    } catch (error) {
+      alert('Error sharing the image: ' + error.message);
+    }  
+  };
+  
+  
+
   const sendMessage = async(message)=>{
-    updateScrollView();
+    updateScrollView(); 
     setText('');
     setMessages(prev => [...prev, { role: 'user', content: message }]);
     try{
@@ -85,9 +112,9 @@ export default function DescriptionPage({image,reTake,description,lang}) {
 
   return (
     <View className="flex-1 w-full">
-        <View className="absolute right-5 top-[44%]" style={{zIndex:1}}>
+        <TouchableOpacity className="absolute right-5 top-[44%]" style={{zIndex:1}} onPress={()=>shareImageWithTitle(image)}>
             <FontAwesome name="share" size={35} color="white" />
-        </View>
+        </TouchableOpacity>
         <Image source={{uri:image}} className="h-[50%]"/>
         <View className="h-[50%] bg-gray-800 flex flex-start items-start">
         <ScrollView 
@@ -138,7 +165,7 @@ export default function DescriptionPage({image,reTake,description,lang}) {
                   onChangeText={newMessage => {setText(newMessage)}}
                   defaultValue={text}
                 />
-                {text?<FontAwesome name="send-o" size={30} color="white" onPress={()=>sendMessage(text)} />:<MaterialIcons name="keyboard-voice" size={40} color="white"/>}
+                {text?<FontAwesome name="send-o" size={30} color="white" onPress={()=>sendMessage(text)} />:<MaterialIcons name="keyboard-voice" size={40} color="white" onPress={()=>isListening?stopListening():startListening()}/>}
             </View>
         </View>
     </View>
