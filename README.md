@@ -81,8 +81,6 @@ With your support, we can continue to improve and expand iSee. Whether through c
 - **GDSC - google developer students club**
 - **AralTech**
 
-## FAQ
-
 ## Contact Us
 - **Email**: [yelimuratovsalimbay@gmail.com](mailto:yelimuratovsalimbay@gmail.com)
 - **GitHub**: [GitHub](https://github.com/yelmuratov)
