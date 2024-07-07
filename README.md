@@ -56,8 +56,8 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 If you have any questions or suggestions, please contact:
 
 - **Email**: [yelimuratovsalimbay@gmail.com](mailto:yelimuratovsalimbay@gmail.com)
-- **GitHub**: [Your GitHub Profile](https://github.com/yelmuratov)
-- **LinkedIn**: [Your LinkedIn Profile](https://www.linkedin.com/in/salimbayelmuratov/)
+- **GitHub**: [GitHub](https://github.com/yelmuratov)
+- **LinkedIn**: [LinkedIn](https://www.linkedin.com/in/salimbayelmuratov/)
 
 ## Screenshots
 
@@ -78,17 +78,12 @@ With your support, we can continue to improve and expand iSee. Whether through c
 
 ## Partners
 
-- [Partner Name]
-- [Partner Name]
+- [GDSC - google developer students club]
+- [AralTech]
 
 ## FAQ
 
-For more information, visit our [FAQ section](https://isee.org/faq).
-
 ## Contact Us
-
-For inquiries and support, please visit our [Contact Us page](https://isee.org/contact).
-
-## Terms of Use
-
-Please review our [Terms of Use](https://isee.org/terms) for more details.
+- **Email**: [yelimuratovsalimbay@gmail.com](mailto:yelimuratovsalimbay@gmail.com)
+- **GitHub**: [GitHub](https://github.com/yelmuratov)
+- **LinkedIn**: [LinkedIn](https://www.linkedin.com/in/salimbayelmuratov/)
