@@ -78,8 +78,8 @@ With your support, we can continue to improve and expand iSee. Whether through c
 
 ## Partners
 
-- [GDSC - google developer students club]
-- [AralTech]
+- **GDSC - google developer students club**
+- **AralTech**
 
 ## FAQ
 
